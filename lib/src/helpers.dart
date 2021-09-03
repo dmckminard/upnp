@@ -1,11 +1,11 @@
 part of upnp;
 
 class WemoHelper {
-  static Map<String, dynamic> parseAttributes(String input) {
+  static Map<String, dynamic>? parseAttributes(String input) {
     var doc = xml
       .parse("<attributes>" + XmlUtils.unescape(input) + "</attributes>")
       .rootElement;
-    var attr = {};
+    Map<String, dynamic>? attr = {};
     doc.children.whereType<XmlElement>().forEach((element) {
       var name = element.findElements("name").first.text.trim();
       dynamic value = element.findElements("value").first.text.trim();

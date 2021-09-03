@@ -77,10 +77,12 @@ class UpnpServer {
       return;
     }
 
-    for (XML.XmlNode node in body.children) {
+    for (XML.XmlNode node in body!.children) {
       if (node is XML.XmlElement) {
         var name = node.name.local;
-        var act = service.actions.firstWhere((x) => x.name == name, orElse: () => null);
+        var act = service.actions.firstWhere((x) => x.name == name, orElse: (){
+          throw TimeoutException("Refresh timeout");
+        });
         if (act == null) {
           request.response
             ..statusCode = HttpStatus.badRequest
@@ -90,7 +92,7 @@ class UpnpServer {
 
         if (act.handler != null) {
           // TODO(kaendfinger): make this have inputs and outputs.
-          await act.handler({});
+          await act.handler!({});
           request.response
             ..statusCode = HttpStatus.ok
             ..close();

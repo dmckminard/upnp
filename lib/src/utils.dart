@@ -18,7 +18,7 @@ class XmlUtils {
     return node.findElements(name).first;
   }
 
-  static String getTextSafe(XmlElement node, String name) {
+  static String? getTextSafe(XmlElement node, String name) {
     var elements = node.findElements(name);
     if (elements.isEmpty) {
       return null;

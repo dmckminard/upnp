@@ -14,13 +14,13 @@ class DialScreen {
       if (ids.contains(client.usn)) {
         continue;
       }
-      ids.add(client.usn);
+      ids.add(client.usn!);
 
       try {
         var dev = await client.getDevice();
         yield new DialScreen(
-          Uri.parse(Uri.parse(client.location).origin),
-          dev.friendlyName
+          Uri.parse(Uri.parse(client.location!).origin),
+          dev!.friendlyName!
         );
       } catch (e) {
         if (!silent) {
@@ -40,7 +40,7 @@ class DialScreen {
   }
 
   Future<bool> isIdle() async {
-    HttpClientResponse response;
+    late HttpClientResponse response;
 
     try {
       response = await send("GET", "/apps");
@@ -68,7 +68,7 @@ class DialScreen {
       payload = out;
     }
 
-    HttpClientResponse response;
+    late HttpClientResponse response;
     try {
       response = await send("POST", "/apps/${app}", body: payload);
       if (response.statusCode == 201) {
@@ -83,7 +83,7 @@ class DialScreen {
   }
 
   Future<bool> hasApp(String app) async {
-    HttpClientResponse response;
+    late HttpClientResponse response;
     try {
       response = await send("GET", "/apps/${app}");
       if (response.statusCode == 404) {
@@ -97,13 +97,13 @@ class DialScreen {
     }
   }
 
-  Future<String> getCurrentApp() async {
-    HttpClientResponse response;
+  Future<String?> getCurrentApp() async {
+    late HttpClientResponse response;
     try {
       response = await send("GET", "/apps");
       if (response.statusCode == 302) {
         var loc = response.headers.value("location");
-        var uri = Uri.parse(loc);
+        var uri = Uri.parse(loc!);
         return uri.pathSegments[1];
       }
       return null;
@@ -114,10 +114,10 @@ class DialScreen {
     }
   }
 
-  Future<bool> close([String app]) async {
+  Future<bool> close([String app = ""]) async {
     var toClose = app == null ? await getCurrentApp() : app;
     if (toClose != null) {
-      HttpClientResponse response;
+      late HttpClientResponse response;
       try {
         response = await send("DELETE", "/apps/${toClose}");
         if (response.statusCode != 200) {
@@ -137,7 +137,7 @@ class DialScreen {
     String method,
     String path, {
       body,
-      Map<String, dynamic> headers
+      Map<String, dynamic> headers = const {}
   }) async {
     var request = await UpnpCommon.httpClient.openUrl(
       method, baseUri.resolve(path)

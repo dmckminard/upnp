@@ -9,9 +9,9 @@ class UpnpDiscoveryServer {
 
   UpnpDiscoveryServer(this.device, this.rootDescriptionUrl);
 
-  RawDatagramSocket _socket;
-  Timer _timer;
-  List<NetworkInterface> _interfaces;
+  RawDatagramSocket? _socket;
+  Timer? _timer;
+  List<NetworkInterface>? _interfaces;
 
   Future start() async {
     await stop();
@@ -25,8 +25,8 @@ class UpnpDiscoveryServer {
     _socket = await RawDatagramSocket.bind("0.0.0.0", 1900);
 
     _interfaces = await NetworkInterface.list();
-    var joinMulticastFunction = _socket.joinMulticast;
-    for (var interface in _interfaces) {
+    var joinMulticastFunction = _socket!.joinMulticast;
+    for (var interface in _interfaces!) {
       withAddress(InternetAddress address) {
         try {
           Function.apply(joinMulticastFunction, [
@@ -52,21 +52,21 @@ class UpnpDiscoveryServer {
       }
     }
 
-    _socket.broadcastEnabled = true;
-    _socket.multicastHops = 100;
+    _socket!.broadcastEnabled = true;
+    _socket!.multicastHops = 100;
 
-    _socket.listen((RawSocketEvent e) async {
+    _socket!.listen((RawSocketEvent e) async {
       if (e == RawSocketEvent.read) {
-        var packet = _socket.receive();
-        _socket.writeEventsEnabled = true;
+        var packet = _socket!.receive();
+        _socket!.writeEventsEnabled = true;
 
         try {
-          var string = utf8.decode(packet.data);
+          var string = utf8.decode(packet!.data);
           var lines = string.split("\r\n");
           var firstLine = lines.first;
 
           if (firstLine.trim() == "M-SEARCH * HTTP/1.1") {
-            var map = {};
+            Map<String, String> map = {};
             for (String line in lines.skip(1)) {
               if (line.trim().isEmpty) continue;
               if (!line.contains(":")) continue;
@@ -78,9 +78,9 @@ class UpnpDiscoveryServer {
 
             if (map["ST"] is String) {
               var search = map["ST"];
-              var devices = await respondToSearch(search, packet, map);
+              var devices = await respondToSearch(search!, packet, map);
               for (var dev in devices) {
-                _socket.send(utf8.encode(dev), packet.address, packet.port);
+                _socket!.send(utf8.encode(dev), packet.address, packet.port);
               }
             }
           }
@@ -108,21 +108,21 @@ class UpnpDiscoveryServer {
     }
 
     if (target == "ssdp:all") {
-      addDevice(device.deviceType);
+      addDevice(device.deviceType!);
 
       for (UpnpHostService svc in device.services) {
-        addDevice(svc.type);
+        addDevice(svc.type!);
       }
     } else if (target == device.deviceType || target == "upnp:rootdevice") {
-      addDevice(device.deviceType);
+      addDevice(device.deviceType!);
     } else if (target == device.udn) {
-      addDevice(device.deviceType);
+      addDevice(device.deviceType!);
     }
 
     var svc = device.findService(target);
 
     if (svc != null) {
-      addDevice(svc.type);
+      addDevice(svc.type!);
     }
 
     return out;
@@ -139,18 +139,18 @@ class UpnpDiscoveryServer {
       buff.write("NTS: ssdp:alive\r\n");
       buff.write("USN: uuid:${UpnpHostUtils.generateToken()}\r\n");
       var bytes = utf8.encode(buff.toString());
-      _socket.send(bytes, _v4_Multicast, 1900);
+      _socket!.send(bytes, _v4_Multicast, 1900);
     }
   }
 
   Future stop() async {
     if (_socket != null) {
-      _socket.close();
+      _socket!.close();
       _socket = null;
     }
 
     if (_timer != null) {
-      _timer.cancel();
+      _timer!.cancel();
       _timer = null;
     }
   }

@@ -1,7 +1,7 @@
 part of upnp.router;
 
 class Router {
-  static Future<Router> find() async {
+  static Future<Router?> find() async {
     try {
       var discovery = new DeviceDiscoverer();
       var client = await discovery.quickDiscoverClients(
@@ -11,7 +11,7 @@ class Router {
 
       var device = await client.getDevice();
       discovery.stop();
-      var router = new Router(device);
+      var router = new Router(device!);
       await router.init();
       return router;
     } catch (e) {
@@ -34,7 +34,7 @@ class Router {
     )) {
       try {
         var device = await client.getDevice();
-        var router = new Router(device);
+        var router = new Router(device!);
         await router.init();
         yield router;
       } catch (e) {
@@ -47,9 +47,9 @@ class Router {
 
   final Device device;
 
-  Service _wanExternalService;
-  Service _wanCommonService;
-  Service _wanEthernetLinkService;
+  Service? _wanExternalService;
+  Service? _wanCommonService;
+  Service? _wanEthernetLinkService;
 
   Router(this.device);
 
@@ -61,28 +61,28 @@ class Router {
     _wanEthernetLinkService = await device.getService("urn:upnp-org:serviceId:WANEthLinkC1");
   }
 
-  Future<String> getExternalIpAddress() async {
-    var result = await _wanExternalService.invokeAction("GetExternalIPAddress", {});
+  Future<String?> getExternalIpAddress() async {
+    var result = await _wanExternalService!.invokeAction("GetExternalIPAddress", {});
     return result["NewExternalIPAddress"];
   }
 
   Future<int> getTotalBytesSent() async {
-    var result = await _wanCommonService.invokeAction("GetTotalBytesSent", {});
-    return num.tryParse(result["NewTotalBytesSent"]) ?? 0;
+    var result = await _wanCommonService!.invokeAction("GetTotalBytesSent", {});
+    return num.tryParse(result["NewTotalBytesSent"]!)!.toInt();
   }
 
   Future<int> getTotalBytesReceived() async {
-    var result = await _wanCommonService.invokeAction("GetTotalBytesReceived", {});
-    return num.tryParse(result["NewTotalBytesReceived"]) ?? 0;
+    var result = await _wanCommonService!.invokeAction("GetTotalBytesReceived", {});
+    return num.tryParse(result["NewTotalBytesReceived"]!)!.toInt();
   }
 
   Future<int> getTotalPacketsSent() async {
-    var result = await _wanCommonService.invokeAction("GetTotalPacketsSent", {});
-    return num.tryParse(result["NewTotalPacketsSent"]) ?? 0;
+    var result = await _wanCommonService!.invokeAction("GetTotalPacketsSent", {});
+    return num.tryParse(result["NewTotalPacketsSent"]!)!.toInt();
   }
 
   Future<int> getTotalPacketsReceived() async {
-    var result = await _wanCommonService.invokeAction("GetTotalPacketsReceived", {});
-    return num.tryParse(result["NewTotalPacketsReceived"]) ?? 0;
+    var result = await _wanCommonService!.invokeAction("GetTotalPacketsReceived", {});
+    return num.tryParse(result["NewTotalPacketsReceived"]!)!.toInt();
   }
 }

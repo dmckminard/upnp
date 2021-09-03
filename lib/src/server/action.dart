@@ -6,7 +6,7 @@ class UpnpHostAction {
   final String name;
   final List<UpnpHostActionArgument> inputs;
   final List<UpnpHostActionArgument> outputs;
-  final HostActionHandler handler;
+  final HostActionHandler? handler;
 
   UpnpHostAction(this.name, {
     this.inputs: const [],
@@ -35,7 +35,7 @@ class UpnpHostActionArgument {
   final bool isOutput;
   final String relatedStateVariable;
 
-  UpnpHostActionArgument(this.name, this.isOutput, {this.relatedStateVariable});
+  UpnpHostActionArgument(this.name, this.isOutput, {this.relatedStateVariable = ""});
 
   void applyToXml(XML.XmlBuilder x) {
     x.element("argument", nest: () {
