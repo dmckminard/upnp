@@ -83,7 +83,7 @@ class Action {
     if (response is XmlElement
       && !response.name.local.contains("Response") &&
       response.children.length > 1) {
-      response = response.children![1] as XmlElement;
+      response = response.children[1] as XmlElement;
     }
 
     if (response.children.length == 1) {

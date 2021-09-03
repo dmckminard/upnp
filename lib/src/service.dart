@@ -93,8 +93,8 @@ class ServiceDescription {
       controlUrl!,
       eventSubUrl!,
       scpdUrl!,
-      acts!,
-      vars!
+      acts,
+      vars
     );
 
     for (var act in acts) {
